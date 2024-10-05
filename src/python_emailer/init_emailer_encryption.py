@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 # set up Fernet encrytion for user
-from cyptography.fernet import Fernet
-from ArgParser import ArgParser
+from cryptography.fernet import Fernet
+from argparse import ArgumentParser
 import os
 
 # todo: consider os.open insead of os.chmod
 
-def parse_args(arg_parser):
-    parser = ArgParser(description='configure fenret encryption for emailer.py')
+def parse_args():
+    arg_parser = ArgumentParser(description='configure fenret encryption for emailer.py')
     arg_parser.add_argument('-o', '--key_out',
       type=str,
-      default='~/.conf/python_emailer/fenret.key', 
+      default='~/.conf/python_emailer/fernet.key', 
       help='path to write encryption key to'
       )
-    arg_parser.add_argument('-p' '--permissions',
+    arg_parser.add_argument('-p', '--permissions',
      type=str, default='600', help='permissions to set on key file')
     return arg_parser.parse_args()
 
@@ -31,11 +31,11 @@ def initialize_encryption(key_out, permissions):
         key = key_file.read()
     
 def main():
-    if args.key_out != '~/.conf/python_emailer/fenret.key':
+    args = parse_args()
+
+    if args.key_out != '~/.conf/python_emailer/fernet.key':
         print('WARNING: using a non-default key path\n'
               'please remember to pass the proper key path when initializing the emailer')
-        )
-    args = parse_args(ArgParser())
     # sanitize path
     key_out = os.path.abspath(os.path.expanduser(args.key_out))
 
@@ -45,7 +45,7 @@ def main():
             print('aborting') 
         return
     print(f'initializing encryption key at {key_out}')
-    initialize_encryption(args.key_out, args.permissions)
+    initialize_encryption(key_out, args.permissions)
     print('encryption key initialized')
 
 if __name__ == '__main__':

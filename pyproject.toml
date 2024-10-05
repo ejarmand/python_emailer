@@ -1,0 +1,22 @@
+[project]
+name = "python_emailer"
+
+authors = [
+    {name = "Ethan J Armand", email="earmand@ucsd.edu"}
+]
+license = {file = "LICENSE"}
+readme = "README.md"
+description = "Python emailer, a minimal library to send texts an emails via SMTP"
+
+dependencies=["cryptography"]
+requires-python = ">=3.7"
+dynamic = ["version"]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+init_emailer_encryption = "python_emailer.init_emailer_encryption:main"
+create_encrypted_emailer = "python_emailer.create_encrypted_emailer:main"
+
