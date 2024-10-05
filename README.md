@@ -12,3 +12,119 @@ This is better than storing plain text but is still a risk. *If a user has sudo 
     - It is generally quite easy to make a new email address and I'd reccomend creating one explicitly for sending messages if possible
 
 *This software is provided without any warranty and I am not responsible for security issues arising from saving a password*
+
+### keeping password from bash history
+Given the command line initialization of an encrypted emailer, you won't want to store the command with your password in your bash history. To avoid this you can run history -c to wipe the current session, or use the HISTCONTROL variable to selectively remove commands from history. You can see options in the [GNU manual section on Bash variables](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html) 
+
+### How to connect to google?
+
+Google disabled unsafe apps from password access as of sept 30, 2024. To connect with a gmail account you'll need to enable 2-step authentication, and then generate an app password [(How to create app passwords)](https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237)
+
+## Installation
+to install clone the repo, and then install with pip, e.g.
+
+```bash
+git clone https://github.com/ejarmand/python_emailer.git
+python3 -m pip install ./python_emailer
+```
+
+## Setup
+To get started you can initialize an encryption key if you want to save the key in a particular location, or you can just create a new encrypted emailer config by calling:
+
+```bash
+create_encrypted_emailer -e your_email@provider.com -s your_passord
+```
+
+If you haven't initialized an encryption key, using `init_emailer_encryption` then you'll be prompted to initialize a key using the same key value listed for your emailer.
+
+## Usage
+
+### emailer class
+After configuring usage is simple:
+```python
+from python_emailer import Emailer
+my_emailer = Emailer(config="path/to/emailer/confg") # config default points to default config path
+my_emailer.send_email(
+                      to="destination@provider.com",
+                      message="Your python script failed without any errors!",
+                      subject="Your script finished :)"
+                      )
+```
+
+### config scripts
+
+```bash
+usage: create_encrypted_emailer [-h] [-e EMAIL] [-p PASSWORD] [-s SERVER] [-k KEY] [--no-store-key] [-o CONFIG_OUT] [--permissions PERMISSIONS]
+
+intialize an encrypted emailer
+
+options:
+  -h, --help            show this help message and exit
+  -e EMAIL, --email EMAIL
+                        email address to send from
+  -p PASSWORD, --password PASSWORD
+                        password for the email address
+  -s SERVER, --server SERVER
+                        smtp server to send email through. default is smtp.gmail.com
+  -k KEY, --key KEY     path to the Fernet key file
+  --no-store-key        do not store the path to key in the configuration file
+  -o CONFIG_OUT, --config_out CONFIG_OUT
+                        path to write encrypted emailer configuration to
+  --permissions PERMISSIONS
+                        permissions for the configuration file default is 600 in octal
+                        format, user can read and write; group and others have no permissions
+```
+
+```bash
+usage: init_emailer_encryption [-h] [-o KEY_OUT] [-p PERMISSIONS]
+
+configure fernet encryption for emailer.py
+
+options:
+  -h, --help            show this help message and exit
+  -o KEY_OUT, --key_out KEY_OUT
+                        path to write encryption key to
+  -p PERMISSIONS, --permissions PERMISSIONS
+                        permissions to set on key file default is 600 in octal
+                        format, user can read and write; group and others have no permissions
+```
+
+
+there is also a `send_sms` method. I'm currently having issues with emails not delivered when sent through python_emailer.
+
+You can wrap the emailer in a finally block to send a message on success or failure:
+
+```python
+from python_emailer import Emailer
+from time import time
+
+def main():
+    ...
+
+if __name__ == __main__:
+    tstart = time()
+    try:
+        main()
+    except Exception as error:
+        print(f'{error} erorr occured')
+    finally:
+        mailer = Emailer()
+        # check for which message to send
+        if error:
+            mailer.send_email(to=your@email.com,
+             f"this is a sad day, your script failed after {time()-tsart} seconds",
+             "script failed"
+             )
+        else:
+            mailer.send_email(to=your@email.com,
+            f"Hooray! Your script ran succesfully in {time()-tsart} seconds!"
+            "script completed without error"
+            )
+```
+
+
+
+
+## Known issues
+### on message filtering
+It seems that it's quite common for sms to get filtered or not delevired, with current methods. That's the primary interest and so is under active development.

@@ -1,7 +1,7 @@
 
 # email functions
 import smtplib
-# from email.mime.text import MIMEText
+from email.mime.text import MIMEText
 from cryptography.fernet import Fernet
 import base64
 import json
@@ -39,18 +39,23 @@ class Emailer:
         return
     
     def send_email(self, to : str,  message : str, subject : str = '') -> None:
+        msg = MIMEText(message)
+        msg['Subject'] = subject
+        msg['From'] = self.fenret.decrypt(self.email).decode('utf-8')
+        msg['To'] = to
         with  smtplib.SMTP(self.server, self.port) as server:
             server.starttls()
             server.login(
                         self.fenret.decrypt(self.email).decode('utf-8'),
                         self.fenret.decrypt(self.password).decode('utf-8')
                         )
-            server.sendmail(self.fenret.decrypt(self.email).decode('utf-8'), to, message)
+            server.sendmail(self.fenret.decrypt(self.email).decode('utf-8'), to, msg.as_string())
             server.quit()
         return
     
     def send_sms(self, to: str, message: str, provider: str) -> None:
         to = to + sms_id(provider)
+        print(to)
         if len(message) > 153:
             warnings.warn('message is longer than 153 characters, it may be truncated')
         self.send_email(to, message)

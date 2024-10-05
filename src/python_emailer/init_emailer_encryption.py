@@ -8,7 +8,7 @@ import os
 # todo: consider os.open insead of os.chmod
 
 def parse_args():
-    arg_parser = ArgumentParser(description='configure fenret encryption for emailer.py')
+    arg_parser = ArgumentParser(description='configure fernet encryption for emailer.py')
     arg_parser.add_argument('-o', '--key_out',
       type=str,
       default='~/.conf/python_emailer/fernet.key', 
