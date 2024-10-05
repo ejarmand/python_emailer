@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+
 # set up Fernet encrytion for user
 from cyptography.fernet import Fernet
 from ArgParser import ArgParser
 import os
+
+# todo: consider os.open insead of os.chmod
 
 def parse_args(arg_parser):
     parser = ArgParser(description='configure fenret encryption for emailer.py')
