@@ -11,4 +11,4 @@ This is better than storing plain text but is still a risk. *If a user has sudo 
 - Avoid using an email address which you use for important things, (e.g. linked to bank or credit card)
     - It is generally quite easy to make a new email address and I'd reccomend creating one explicitly for sending messages if possible
 
-*This software is provided without any warrenty and I am not responsible for security issues arising from saving a password*
+*This software is provided without any warranty and I am not responsible for security issues arising from saving a password*
