@@ -1,6 +1,47 @@
 # Python Emailer
-
 A python class meant to send simple email messages.
+
+
+## Installation
+to install clone the repo, and then install with pip, e.g.
+
+```bash
+git clone https://github.com/ejarmand/python_emailer.git
+python3 -m pip install ./python_emailer
+```
+
+## Setup
+To get started you can initialize an encryption key if you want to save the key in a particular location, or you can just create a new encrypted emailer config by calling:
+
+```bash
+create_encrypted_emailer -e your_email@provider.com -s your_passord
+```
+
+If you haven't initialized an encryption key, using `init_emailer_encryption` then you'll be prompted to initialize a key using the same key value listed for your emailer.
+
+### Twilio
+I've set up the emailer to send useing [twilio](https://www.twilio.com/docs/usage/api) as a backend as this should be superior for sms (although requires a new account and costs some money per text). This is similarly initilaized with `create_encrypted_twilio`, e.g.
+
+
+```bash
+create_encrypted_twilio -i twilioSID -t authenticaiton_token -p phone_number_you_send_messages_from
+```
+
+You can't send messages from your own number to itself using twilio. You can purchase and set up a phone number via twilio but it's complicated. (though much cheaper than adding a new line). I may look into setting up a way to forward from smtp, to a server which passes on the sms via twilio to increase accesibility to my friends who don't want to configure an account. Clearly not a universal solution.
+
+## Usage
+
+### emailer class
+After configuring usage is simple, the difference in between smtp and twilio is taken care of by the config:
+```python
+from python_emailer import Emailer
+my_emailer = Emailer(config="path/to/emailer/confg") # config default points to default config path
+my_emailer.send_email(
+                      to="destination@provider.com",
+                      message="Your python script failed without any errors!",
+                      subject="Your script finished :)"
+                      )
+```
 
 ## Security warning
 
@@ -20,36 +61,6 @@ Given the command line initialization of an encrypted emailer, you won't want to
 
 Google disabled unsafe apps from password access as of sept 30, 2024. To connect with a gmail account you'll need to enable 2-step authentication, and then generate an app password [(How to create app passwords)](https://knowledge.workspace.google.com/kb/how-to-create-app-passwords-000009237)
 
-## Installation
-to install clone the repo, and then install with pip, e.g.
-
-```bash
-git clone https://github.com/ejarmand/python_emailer.git
-python3 -m pip install ./python_emailer
-```
-
-## Setup
-To get started you can initialize an encryption key if you want to save the key in a particular location, or you can just create a new encrypted emailer config by calling:
-
-```bash
-create_encrypted_emailer -e your_email@provider.com -s your_passord
-```
-
-If you haven't initialized an encryption key, using `init_emailer_encryption` then you'll be prompted to initialize a key using the same key value listed for your emailer.
-
-## Usage
-
-### emailer class
-After configuring usage is simple:
-```python
-from python_emailer import Emailer
-my_emailer = Emailer(config="path/to/emailer/confg") # config default points to default config path
-my_emailer.send_email(
-                      to="destination@provider.com",
-                      message="Your python script failed without any errors!",
-                      subject="Your script finished :)"
-                      )
-```
 
 ### config scripts
 
@@ -126,5 +137,7 @@ if __name__ == __main__:
 
 
 ## Known issues
-### on message filtering
-It seems that it's quite common for sms to get filtered or not delevired, with current methods. That's the primary interest and so is under active development.
+### sending messages to verizon
+
+It seems Verizon agressively filters and slows messages sent to @vtext.com. This seems to coincide with them introducing an enterprise service to allow sms sent from email via SMTP.
+

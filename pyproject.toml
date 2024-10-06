@@ -19,4 +19,5 @@ build-backend = "setuptools.build_meta"
 [project.scripts]
 init_emailer_encryption = "python_emailer.init_emailer_encryption:main"
 create_encrypted_emailer = "python_emailer.create_encrypted_emailer:main"
+create_encrypted_twilio = "python_emailer.create_encrypted_twilio:main"
 
