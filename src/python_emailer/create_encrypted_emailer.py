@@ -34,6 +34,10 @@ def parse_args():
         default='~/.conf/python_emailer/emailer_config.pkl',
         help='path to write encrypted emailer configuration to'
     )
+    parser.add_argument('--slackWebhook', 
+                        type=str,
+                        help='slack webhook url for the "send_slack" method'
+    )
     parser.add_argument('--permissions', 
         type=str,
         default='600',
@@ -41,6 +45,7 @@ def parse_args():
               ' in octal format, user can read and write; group and others have no permissions'
         )
     )
+
     return parser.parse_args()
 
 def main():
@@ -70,6 +75,8 @@ def main():
                 'password': args.password,
                 'server': args.server,
                 'port': PORT}
+    if args.slackWebhook:
+        params['slack'] = args.slackWebhook
     params_encrypt = {'key' : args.key if not args.no_store_key else '',
                     'params': base64.b64encode(
                                 fernet.encrypt(

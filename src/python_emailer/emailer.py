@@ -8,21 +8,24 @@ import json
 import warnings
 from twilio.rest import Client
 import os
-
+import requests
+import json
 
 class Emailer:
     def __init__(self,
                  version : str = 'email',
                  config : str = '~/.conf/python_emailer/emailer_config.pkl', 
-                 key : str = None) -> None:
+                 key : str = None,
+                 slack_webhook : str =None) -> None:
         if version.lower() == 'twilio':
             # adjusts the default config
             if config == '~/.conf/python_emailer/emailer_config.pkl':
                 config = '~/.conf/python_emailer/twilio_config.pkl'
         config = os.path.abspath(os.path.expanduser(config))
-        self.load_config(config, key)
+        self.load_config(config, key, slack_webhook=slack_webhook)
 
-    def load_config(self, config : str, key : str = None)-> None:
+    def load_config(self, config : str, key : str = None,
+                     slack_webhook : str =None)-> None:
         with open(config, 'rb') as config_file:
             config = json.load(config_file)
             if not key:
@@ -37,6 +40,10 @@ class Emailer:
                     )
                 ).decode('utf-8')
             )
+            if slack_webhook is not None:
+                self.slack = slack
+            elif 'slack' in params.keys():
+                self.slack = params['slack']
             if 'twilio' in config.keys():
                 self._load_twilio_config(
                     params['sid'],
@@ -64,7 +71,7 @@ class Emailer:
         self.twilio_token = self.fenret.encrypt(token.encode('utf-8'))
         self.phone_number = phone_number
         return
-
+    
     
     def send_email(self, to : str,  message : str, subject : str = '') -> None:
         if hasattr(self, 'twilio_sid'):
@@ -101,6 +108,13 @@ class Emailer:
         self.send_email(to, message)
         return
     
+    def send_slack(self, message: str) -> None:
+        to_send = {'text': message}
+        response = requests.post(self.slack, data=json.dumps(to_send))
+        if response.status_code != 200:
+            warnings.warn(f'failed to send message, status code: {response.status_code}')
+        return
+    
     def _send_twilio(self, to: str, message: str) -> None:
         if not to.startswith('+1'):
             to = '+1' + to
@@ -114,6 +128,8 @@ class Emailer:
             body=message
         )
         return
+    
+
 
 def sms_id(provider : str) -> str:
     sms_conversion = {

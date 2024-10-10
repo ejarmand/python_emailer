@@ -36,6 +36,10 @@ def parse_args():
         default='~/.conf/python_emailer/twilio_config.pkl',
         help='path to write encrypted emailer configuration to'
     )
+    parser.add_argument('--slackWebhook', 
+                        type=str,
+                        help='slack webhook url for the "send_slack" method'
+    )
     parser.add_argument('--permissions', 
         type=str,
         default='600',
@@ -72,6 +76,8 @@ def main():
                 'token': args.token,
                 'phone_number': args.phone_number,
                 }
+    if args.slackWebhook:
+        params['slack'] = args.slackWebhook
     
     params_encrypt = {'key' : args.key if not args.no_store_key else '',
                       'twilio' :'', 
@@ -81,6 +87,7 @@ def main():
                                 )
                               ).decode('utf-8')
                     }
+
     config_out = os.path.abspath(os.path.expanduser(args.config_out))
 
     with open(config_out, 'w') as config_file:
